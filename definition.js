@@ -1,7 +1,7 @@
 // UNOARM v3 (ORC CONTROL HUB): giu nguyen 8 khoi va noi dung chu cua ban xbot (kdi_xbot_extension_arm).
 // Khac ban xbot o phan sinh code: ham di chuyen cua kdi_unoarm.py la async nen sinh `await`,
 // va moi khoi dang ky kdi_unoarm.dung_lai() vao ham deinit() cua Hub (chay khi chuong trinh bi dung).
-// Khong co khoi khoi tao: lan di chuyen dau tien thu vien tu cho nhan nut BOOT roi moi noi servo.
+// Khong co khoi khoi tao va khong co nut BOOT (giong ban xbot): lan di chuyen dau tien thu vien tu noi servo roi di.
 function unoarmUse() {
   Blockly.Python.definitions_['import_kdi_unoarm'] = 'import kdi_unoarm';
   Blockly.Python.definitions_['deinit_kdi_unoarm'] = 'kdi_unoarm.dung_lai()';

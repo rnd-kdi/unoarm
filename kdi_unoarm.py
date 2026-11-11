@@ -9,10 +9,10 @@
 #       co_the_toi(r, h), set_dimensions(d1..d5), khoi_tao(...), dat_gioi_han(...), dat_toc_do(...),
 #       dat_toc_do_phan_tram(...), thong_tin(),
 #       dung_lai() (dung ngay lenh di chuyen dang chay; dang ky trong hook yolo_uno.deinit)
-#   - Ham cho nhan nut BOOT (async): await cho_nhan_BOOT()  (dat truoc khoi_tao de an toan)
-#   - Bo khoi chi co 8 khoi (nhu ban xbot), KHONG co khoi khoi tao: lan di chuyen dau tien thu vien tu khoi tao,
-#     tren board tu cho nhan nut BOOT roi moi noi servo (xem _dam_bao_khoi_tao). Cac ham khac (dat_gioi_han,
-#     dat_toc_do_phan_tram, co_the_toi, quay_ve_goc, ve_vi_tri_dau, dung_lai) van co de goi bang code.
+#   - Bo khoi chi co 8 khoi (nhu ban xbot), KHONG co khoi khoi tao va KHONG co nut BOOT: keo khoi di chuyen ra la chay.
+#     Lan di chuyen dau tien thu vien tu khoi tao ngay (noi servo va gui tu the bat dau (10, 10), xem _dam_bao_khoi_tao).
+#     Cac ham khac (dat_gioi_han, dat_toc_do_phan_tram, co_the_toi, quay_ve_goc, ve_vi_tri_dau, dung_lai,
+#     cho_nhan_BOOT) van co de goi bang code.
 #   - Ham di chuyen, la `async`, PHAI goi bang `await` (khong chan cac task khac nhu task_forever, BLE):
 #       await go_to_S2_S3(S2, S3), await go_to_r_h(r, h), await quay_ve_goc(goc_S1), await ve_vi_tri_dau()
 #   Mot luc chi co mot lenh di chuyen S2/S3 chay; lenh thu hai goi khi lenh truoc chua xong se bi tu choi.
@@ -109,7 +109,6 @@ _dang_chay = False      # dang di chuyen S2/S3
 _dang_chay_S1 = False   # dang quay S1
 _yeu_cau_dung = False   # dung_lai() dat True de cac vong di chuyen dang chay thoat ngay
 _da_khoi_tao = False    # khoi_tao() da chay xong (goi tay hoac tu dong o lan di chuyen dau tien)
-_dang_khoi_tao = False  # dang tu khoi tao (cho nhan BOOT); cac lenh di chuyen khac phai doi
 
 
 # ---------------------------------------------------------------------------------------------
@@ -341,29 +340,20 @@ def _san_sang():
 
 
 async def _dam_bao_khoi_tao():
-    """Khong co khoi 'khoi tao' trong bo khoi, nen lan di chuyen dau tien tu khoi tao neu chua khoi_tao().
-    Tren board: cho nhan nut BOOT (robot phai da duoc dat tay o (10, 10)) roi noi servo va gui tu the bat dau.
-    Tren may tinh (khong co thu vien phan cung): chay thu (dry_run). Tra ve True neu san sang."""
-    global _dang_khoi_tao
+    """Khong co khoi 'khoi tao' trong bo khoi, nen lan di chuyen dau tien tu khoi tao neu chua khoi_tao(), NGAY (khong
+    cho nut BOOT, giong ban xbot): tren board noi servo va gui tu the bat dau (10, 10) (robot phai duoc dat tay o do
+    truoc khi cap nguon, neu khong servo se nhay ve (10, 10)). Tren may tinh (khong co thu vien phan cung): chay thu
+    (dry_run). Tra ve True neu san sang. Khong co await ben trong nen hai lenh goi chong khong the khoi tao doi."""
     if _da_khoi_tao:
         return True
-    if _dang_khoi_tao:
-        while _dang_khoi_tao:           # lenh khac dang cho BOOT: doi no xong
-            await _asleep_ms(50)
-        return _da_khoi_tao
-    _dang_khoi_tao = True
-    try:
-        if CO_PHAN_CUNG:
-            await cho_nhan_BOOT()
-            return khoi_tao(dry_run=False)
-        if _la_board():
-            # dang tren board nhung thieu mdv2/servo: KHONG am tham chay thu, bao ro de nguoi dung them thu vien nen
-            print('LOI: board thieu thu vien mdv2.py / servo.py. Hay them extension robotics goc (yolouno_extension_robotics) '
-                  'roi chay lai. Robot khong nhan lenh nao.')
-            return False
-        return khoi_tao(dry_run=True)
-    finally:
-        _dang_khoi_tao = False
+    if CO_PHAN_CUNG:
+        return khoi_tao(dry_run=False)
+    if _la_board():
+        # dang tren board nhung thieu mdv2/servo: KHONG am tham chay thu, bao ro de nguoi dung them thu vien nen
+        print('LOI: board thieu thu vien mdv2.py / servo.py. Hay them extension robotics goc (yolouno_extension_robotics) '
+              'roi chay lai. Robot khong nhan lenh nao.')
+        return False
+    return khoi_tao(dry_run=True)
 
 
 async def go_to_S2_S3(to_S2, to_S3, delay_ms=None):
@@ -582,8 +572,9 @@ def _chan_boot():
 
 
 async def cho_nhan_BOOT():
-    """Cho den khi nhan nut BOOT (roi tha nut). Doc truc tiep chan BOOT, KHONG tao aButton de khong xung dot voi
-    khoi 'nut BOOT' cua he thong. Dat truoc khoi_tao: servo khong nhan lenh nao cho toi khi ban dat tay robot xong."""
+    """TUY CHON, KHONG tu goi (bo khoi khong dung nut BOOT). Cho den khi nhan nut BOOT (roi tha nut); doc truc tiep chan
+    BOOT, khong tao aButton de khong xung dot voi khoi 'nut BOOT' cua he thong. Ai muon an toan hon thi goi
+    `await cho_nhan_BOOT()` truoc lenh di chuyen dau tien."""
     print('Dat tay robot o (S2, S3) = (%d, %d), S1 o giua (%d), roi nhan nut BOOT de tiep tuc' % (S2_BAT_DAU, S3_BAT_DAU, S1_BAT_DAU))
     nut = _chan_boot()
     while nut.value() != 0:
