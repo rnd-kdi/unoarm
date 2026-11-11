@@ -1,0 +1,16 @@
+{
+    "name": "UNOARM by KDI EDU",
+    "description": "Thư viện điều khiển robot UnoArm v3 với ORC CONTROL HUB",
+    "libs": [
+        "constants.py",
+        "mdv2.py",
+        "servo.py",
+        "kdi_unoarm.py"
+    ],
+    "blocks": [
+        "definition.js"
+    ],
+    "toolbox": "toolbox.xml",
+    "languages": {},
+    "poster": "kdi.jpg"
+}
