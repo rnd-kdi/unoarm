@@ -26,8 +26,9 @@
 #     va khong thap hon H_TOI_THIEU. Neu co diem xau thi KHONG gui gi ca.
 #  4. Hinh thang la vung loi, nen duong thang giua hai diem hop le van hop le.
 #
-# Vung hop le (S2, S3), hinh thang voi 4 dinh (10,10) (75,10) (140,100) (10,100):
-#    S2 >= 10,  10 <= S3 <= 100,  18*S2 - 13*S3 <= 1220   (canh xien qua (75,10) va (140,100))
+# Vung hop le (S2, S3), hinh thang voi 4 dinh (10,10) (120,10) (140,100) (10,100):
+#    S2 >= 10,  10 <= S3 <= 100,  9*S2 - 2*S3 <= 1060   (canh xien qua (120,10) va (140,100))
+#    (canh xien cu qua (75,10): 18*S2 - 13*S3 <= 1220; da keo day ra toi S2 = 120, dau hut cach ban 0.29 cm)
 #
 # Cong thuc v3 (H2 = 90, H3 = 70, sigma2 = -1, sigma3 = +1, banh rang 2:1 ca hai truc):
 #    phi1 = 185 - S2/2            phi2 = (S2 + S3)/2 + 20
@@ -73,9 +74,9 @@ S1_MAX = 180
 S2_MIN = 10
 S3_MIN = 10
 S3_MAX = 100
-CX_A = 18      # canh xien: CX_A*S2 - CX_B*S3 <= CX_C
-CX_B = 13
-CX_C = 1220
+CX_A = 9       # canh xien: CX_A*S2 - CX_B*S3 <= CX_C, qua (120, 10) va (140, 100)
+CX_B = 2
+CX_C = 1060
 S2_MAX = (CX_C + CX_B * S3_MAX) // CX_A   # = 140, S2 lon nhat (tai S3 = 100)
 
 # ---------------------------------------------------------------------------------------------
